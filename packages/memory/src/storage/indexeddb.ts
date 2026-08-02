@@ -1,3 +1,3 @@
-export class IndexedDbStorageAdapter {
-  public readonly kind = 'indexeddb';
-}
+export const indexedDbStorage = async () => {
+  return undefined;
+};

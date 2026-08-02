@@ -1,4 +1,4 @@
-import { PageField, PageModel } from '@browser-ai/shared/types';
+import { PageField, PageModel } from '@browser-ai/shared';
 
 export class PageModelBuilder {
   private fields: PageField[] = [];
@@ -7,12 +7,14 @@ export class PageModelBuilder {
     this.fields.push(field);
   }
 
-  build(): PageModel {
+  build(doc: Document = document): PageModel {
+    const defaultView = doc.defaultView;
+
     return {
-      url: window.location.href,
-      title: document.title,
-      forms: document.forms.length,
-      fields: this.fields,
+      url: defaultView?.location.href ?? '',
+      title: doc.title,
+      forms: doc.forms.length,
+      fields: [...this.fields],
       scannedAt: Date.now(),
     };
   }

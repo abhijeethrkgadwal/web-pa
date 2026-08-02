@@ -1,0 +1,13 @@
+{
+  "name": "@browser-ai/agents",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@browser-ai/ai": "workspace:*",
+    "@browser-ai/commands": "workspace:*",
+    "@browser-ai/contracts": "workspace:*",
+    "@browser-ai/memory": "workspace:*",
+    "@browser-ai/shared": "workspace:*"
+  }
+}

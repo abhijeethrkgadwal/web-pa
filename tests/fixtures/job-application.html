@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Job Application Fixture</title>
+  </head>
+  <body>
+    <h1>Apply Now</h1>
+    <form id="job-form" action="/apply" method="post">
+      <div>
+        <label for="first-name">First Name</label>
+        <input id="first-name" name="firstName" type="text" required maxlength="50" />
+      </div>
+
+      <div>
+        <label for="email">Email Address</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+
+      <div>
+        <label for="phone">Phone</label>
+        <input id="phone" name="phone" type="tel" />
+      </div>
+
+      <div>
+        <label for="country">Country</label>
+        <select id="country" name="country" required>
+          <option value="">Select</option>
+          <option value="in">India</option>
+          <option value="us">United States</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="summary">Summary</label>
+        <textarea id="summary" name="summary" maxlength="500"></textarea>
+      </div>
+
+      <div>
+        <label>
+          <input type="checkbox" name="relocate" value="yes" />
+          Willing to relocate
+        </label>
+      </div>
+
+      <div style="display: none">
+        <label for="hidden-notes">Hidden Notes</label>
+        <input id="hidden-notes" name="hiddenNotes" type="text" />
+      </div>
+
+      <input type="hidden" name="csrf" value="token" />
+
+      <button type="submit">Submit Application</button>
+    </form>
+  </body>
+</html>

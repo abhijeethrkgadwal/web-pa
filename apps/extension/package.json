@@ -2,10 +2,35 @@
   "name": "@browser-ai/extension",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@browser-ai/agents": "workspace:*",
+    "@browser-ai/ai": "workspace:*",
+    "@browser-ai/browser": "workspace:*",
+    "@browser-ai/commands": "workspace:*",
+    "@browser-ai/contracts": "workspace:*",
+    "@browser-ai/engine": "workspace:*",
+    "@browser-ai/memory": "workspace:*",
+    "@browser-ai/page-model": "workspace:*",
+    "@browser-ai/shared": "workspace:*",
+    "@browser-ai/telemetry": "workspace:*",
+    "@browser-ai/voice": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.28",
+    "@types/chrome": "^0.0.287",
+    "@types/node": "^26.1.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "typescript": "^5.6.3",
     "vite": "^5.4.10"
   }
 }

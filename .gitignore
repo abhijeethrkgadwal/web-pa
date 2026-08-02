@@ -1,5 +1,10 @@
 node_modules
+dist
 .dist
 coverage
 .vscode-test
 *.log
+test-results
+playwright-report
+blob-report
+tests/e2e/dist

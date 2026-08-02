@@ -9,11 +9,21 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node tests/e2e/build-harness.mjs && playwright test",
+    "test:e2e:install": "playwright install chromium",
+    "dev:extension": "pnpm --filter @browser-ai/extension dev",
+    "build:extension": "pnpm --filter @browser-ai/extension build",
+    "serve:fixtures": "node scripts/serve-fixtures.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "esbuild": "^0.24.2",
+    "jsdom": "^25.0.1",
     "turbo": "^2.0.0",
     "typescript": "^5.6.3",
     "vitest": "^2.1.8"
   }
 }
+

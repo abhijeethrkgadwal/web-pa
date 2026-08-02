@@ -1,7 +1,9 @@
+import type { PageField } from './page-field';
+
 export interface PageModel {
-  title?: string;
-  fields?: Array<{
-    name: string;
-    type: string;
-  }>;
+  url: string;
+  title: string;
+  forms: number;
+  fields: PageField[];
+  scannedAt: number;
 }

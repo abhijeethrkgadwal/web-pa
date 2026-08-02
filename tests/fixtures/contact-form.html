@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Contact Form Fixture</title>
+  </head>
+  <body>
+    <h1>Contact Us</h1>
+    <form id="contact-form">
+      <div>
+        <label for="full-name">Full Name</label>
+        <input id="full-name" name="fullName" type="text" required />
+      </div>
+
+      <div>
+        <label for="contact-email">Email</label>
+        <input id="contact-email" name="email" type="email" required />
+      </div>
+
+      <div>
+        <label for="contact-phone">Phone Number</label>
+        <input id="contact-phone" name="phone" type="tel" />
+      </div>
+
+      <div>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" required maxlength="300"></textarea>
+      </div>
+
+      <button type="submit">Send</button>
+    </form>
+  </body>
+</html>

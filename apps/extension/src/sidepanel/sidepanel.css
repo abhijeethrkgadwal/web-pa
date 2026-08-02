@@ -1,0 +1,152 @@
+:root {
+  color-scheme: light;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #14213d;
+  background: #f7f4ef;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.sidepanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  min-height: 100vh;
+}
+
+.sidepanel__header h1 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.sidepanel__header p {
+  margin: 0;
+  color: #5c677d;
+  font-size: 12px;
+}
+
+.sidepanel__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sidepanel__row {
+  display: flex;
+  gap: 8px;
+}
+
+.sidepanel__row input {
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 400;
+}
+
+.sidepanel__primary,
+.sidepanel__secondary {
+  appearance: none;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sidepanel__primary {
+  background: #0f766e;
+  color: #fff;
+}
+
+.sidepanel__secondary {
+  background: #334155;
+  color: #fff;
+}
+
+.sidepanel__primary:disabled,
+.sidepanel__secondary:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.sidepanel__hint {
+  margin: 0;
+  color: #5c677d;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.sidepanel__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #dbe3ee;
+}
+
+.sidepanel__preview-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.sidepanel__preview ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidepanel__preview li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.sidepanel__preview li span {
+  color: #5c677d;
+}
+
+.sidepanel__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.sidepanel__actions button {
+  flex: 1;
+}
+
+.sidepanel__status {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: pre-line;
+}
+
+.sidepanel__status--ok {
+  background: #dff7f1;
+  color: #0f5132;
+}
+
+.sidepanel__status--error {
+  background: #fde8e8;
+  color: #9b1c1c;
+}

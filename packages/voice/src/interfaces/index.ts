@@ -1,6 +1,6 @@
-/**
- * TODO: Define voice-related interfaces and contracts.
- */
-export interface VoiceInputConfig {
-  readonly sampleRate: number;
-}
+export type {
+  SpeechRecognitionContract,
+  TranscriptionResult,
+  VoiceCommand,
+  VoiceInputConfig,
+} from '@browser-ai/contracts';

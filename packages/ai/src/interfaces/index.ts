@@ -1,12 +1,6 @@
-/**
- * TODO: Define shared AI interfaces such as model providers and message contracts.
- */
-export interface AIMessage {
-  readonly role: 'system' | 'user' | 'assistant';
-  readonly content: string;
-}
-
-export interface AIProvider {
-  readonly name: string;
-  generate(messages: AIMessage[]): Promise<string>;
-}
+export type { AIMessage, AIProvider, AIResponse } from '@browser-ai/contracts';
+export type {
+  FieldMapping,
+  FieldMappingRequest,
+  FieldMappingResult,
+} from '@browser-ai/contracts';

@@ -1,3 +1,3 @@
-export const findTables = async () => {
-  return undefined;
+export const scanTables = async () => {
+  return [];
 };

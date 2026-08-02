@@ -2,5 +2,14 @@
   "name": "@browser-ai/engine",
   "version": "0.0.1",
   "private": true,
-  "main": "./src/index.ts"
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@browser-ai/agents": "workspace:*",
+    "@browser-ai/browser": "workspace:*",
+    "@browser-ai/commands": "workspace:*",
+    "@browser-ai/contracts": "workspace:*",
+    "@browser-ai/memory": "workspace:*",
+    "@browser-ai/shared": "workspace:*",
+    "@browser-ai/telemetry": "workspace:*"
+  }
 }

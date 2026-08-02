@@ -1,10 +1,7 @@
-/**
- * TODO: Define command interfaces and payload contracts.
- */
-export interface CommandContext {
-  readonly source: string;
-}
-
-export interface CommandHandler {
-  execute(context: CommandContext): Promise<void>;
-}
+export type {
+  Command,
+  CommandContext,
+  CommandHandler,
+  CommandResult,
+  CommandRegistryContract,
+} from '@browser-ai/contracts';

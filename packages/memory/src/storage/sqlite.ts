@@ -1,3 +1,3 @@
-export class SqliteStorageAdapter {
-  public readonly kind = 'sqlite';
-}
+export const sqliteStorage = async () => {
+  return undefined;
+};

@@ -1,3 +1,3 @@
-export const findLinks = async () => {
-  return undefined;
+export const scanLinks = async () => {
+  return [];
 };
