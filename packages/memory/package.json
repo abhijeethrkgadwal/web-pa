@@ -1,7 +1,9 @@
 {
   "name": "@browser-ai/memory",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "description": "Local profile, answer memory, and AI/STT/TTS settings for Browser AI.",
   "main": "./src/index.ts",
   "dependencies": {
     "@browser-ai/contracts": "workspace:*"

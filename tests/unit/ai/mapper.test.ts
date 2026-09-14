@@ -77,6 +77,43 @@ describe('heuristic field mapper', () => {
     expect(mappings.some((item) => item.selector === '#secret')).toBe(false);
   });
 
+  it('does not fill consent/opinion questions with summary text', () => {
+    const noisyFields: PageField[] = [
+      {
+        id: 'contact',
+        name: 'contactOptIn',
+        type: FieldType.CHECKBOX,
+        label:
+          'Yes, Geomiq can contact me directly about specific future job opportunities.',
+        selector: '#contact-opt-in',
+        visible: true,
+      },
+      {
+        id: 'commute',
+        name: 'commute',
+        type: FieldType.TEXT,
+        label: 'How do you feel about commuting to the office 4 days a week?',
+        selector: '#commute',
+        visible: true,
+      },
+      {
+        id: 'cover',
+        name: 'coverLetter',
+        type: FieldType.TEXTAREA,
+        label: 'Cover letter',
+        selector: '#cover-letter',
+        visible: true,
+      },
+    ];
+
+    const mappings = mapProfileToFieldsHeuristic(profile, noisyFields);
+    expect(mappings.some((item) => item.selector === '#contact-opt-in')).toBe(false);
+    expect(mappings.some((item) => item.selector === '#commute')).toBe(false);
+    expect(mappings.find((item) => item.selector === '#cover-letter')?.value).toBe(
+      'Building Browser AI',
+    );
+  });
+
   it('falls back to heuristics when AI is disabled', async () => {
     const result = await mapProfileToFields({
       profile,

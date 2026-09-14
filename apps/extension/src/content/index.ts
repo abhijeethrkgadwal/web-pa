@@ -1,5 +1,12 @@
 import { fillDemoValues, scanForms } from '@browser-ai/browser';
-import { confirmSmartFill, previewSmartFill, runSmartFill } from '@browser-ai/engine';
+import {
+  confirmConcierge,
+  confirmSmartFill,
+  previewConcierge,
+  previewSmartFill,
+  runSmartFill,
+  submitConciergeForm,
+} from '@browser-ai/engine';
 
 import {
   MESSAGE_TYPES,
@@ -180,6 +187,86 @@ chrome.runtime.onMessage.addListener(
     if (message?.type === MESSAGE_TYPES.CANCEL_FILL) {
       console.info('[Browser AI] fill cancelled — page untouched');
       sendResponse({ ok: true, cancelled: true });
+      return true;
+    }
+
+    if (message?.type === MESSAGE_TYPES.CONCIERGE_PREVIEW) {
+      void previewConcierge()
+        .then((result) => {
+          console.info('[Browser AI] concierge preview', result);
+          sendResponse({
+            ok: result.ok,
+            site: result.site,
+            title: result.title,
+            url: result.url,
+            fields: result.fields,
+            knownCount: result.knownCount,
+            unknownCount: result.unknownCount,
+            skippedUploadCount: result.skippedUploadCount,
+            submit: result.submit,
+            error: result.error,
+          });
+        })
+        .catch((error: unknown) => {
+          sendResponse({
+            ok: false,
+            site: '',
+            title: document.title,
+            url: window.location.href,
+            fields: [],
+            knownCount: 0,
+            unknownCount: 0,
+            skippedUploadCount: 0,
+            error: error instanceof Error ? error.message : 'Concierge preview failed',
+          });
+        });
+      return true;
+    }
+
+    if (message?.type === MESSAGE_TYPES.CONCIERGE_CONFIRM) {
+      void confirmConcierge(message.fields, message.site)
+        .then((result) => {
+          console.info('[Browser AI] concierge confirm', result);
+          sendResponse({
+            ok: true,
+            success: result.success,
+            completed: result.completed,
+            total: result.total,
+            learned: result.learned,
+            submit: result.submit,
+            error: result.error,
+          });
+        })
+        .catch((error: unknown) => {
+          sendResponse({
+            ok: true,
+            success: false,
+            completed: 0,
+            total: 0,
+            learned: 0,
+            error: error instanceof Error ? error.message : 'Concierge confirm failed',
+          });
+        });
+      return true;
+    }
+
+    if (message?.type === MESSAGE_TYPES.CONCIERGE_SUBMIT) {
+      void submitConciergeForm(message.selector)
+        .then((result) => {
+          sendResponse({
+            ok: true,
+            success: result.success,
+            label: result.label,
+            error: result.error,
+          });
+        })
+        .catch((error: unknown) => {
+          sendResponse({
+            ok: true,
+            success: false,
+            error: error instanceof Error ? error.message : 'Submit failed',
+          });
+        });
       return true;
     }
 

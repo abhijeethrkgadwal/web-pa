@@ -1,11 +1,14 @@
 {
   "name": "@browser-ai/ai",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "description": "Pluggable LLM providers, field mapping, and voice intent for Browser AI.",
   "main": "./src/index.ts",
   "dependencies": {
     "@browser-ai/contracts": "workspace:*",
     "@browser-ai/memory": "workspace:*",
-    "@browser-ai/shared": "workspace:*"
+    "@browser-ai/shared": "workspace:*",
+    "@browser-ai/voice": "workspace:*"
   }
 }

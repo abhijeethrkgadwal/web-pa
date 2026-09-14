@@ -42,6 +42,28 @@ describe('UserProfile memory', () => {
     expect(hasProfileValues(profile)).toBe(true);
   });
 
+  it('saves and retrieves address fields', async () => {
+    await saveUserProfile(
+      {
+        firstName: 'Abhijeeth',
+        address: {
+          line1: '12 MG Road',
+          city: 'Bengaluru',
+          state: 'KA',
+          postalCode: '560001',
+          country: 'India',
+        },
+      },
+      store,
+    );
+
+    const profile = await getUserProfile(store);
+    expect(profile.address?.line1).toBe('12 MG Road');
+    expect(profile.address?.city).toBe('Bengaluru');
+    expect(profile.address?.postalCode).toBe('560001');
+    expect(hasProfileValues(profile)).toBe(true);
+  });
+
   it('clears a saved profile', async () => {
     await saveUserProfile({ firstName: 'Abhijeeth' }, store);
     await clearUserProfile(store);

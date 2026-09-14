@@ -16,3 +16,4 @@ export * from './form-agent';
 export * from './memory-agent';
 export * from './navigator-agent';
 export * from './planner-agent';
+export * from './concierge-agent';

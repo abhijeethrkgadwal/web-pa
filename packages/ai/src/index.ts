@@ -19,3 +19,4 @@ export * from './providers';
 export * from './tools';
 export * from './interfaces';
 export * from './mapper';
+export * from './intent';

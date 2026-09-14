@@ -1,4 +1,4 @@
-import type { FieldMapping } from '@browser-ai/contracts';
+import type { ConciergeFieldItem } from '@browser-ai/engine';
 
 export const MESSAGE_TYPES = {
   PING: 'browser-ai:ping',
@@ -8,6 +8,9 @@ export const MESSAGE_TYPES = {
   PREVIEW_FILL: 'browser-ai:preview-fill',
   CONFIRM_FILL: 'browser-ai:confirm-fill',
   CANCEL_FILL: 'browser-ai:cancel-fill',
+  CONCIERGE_PREVIEW: 'browser-ai:concierge-preview',
+  CONCIERGE_CONFIRM: 'browser-ai:concierge-confirm',
+  CONCIERGE_SUBMIT: 'browser-ai:concierge-submit',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -73,7 +76,7 @@ export interface PreviewFillRequest {
 
 export interface PreviewFillResponse {
   readonly ok: boolean;
-  readonly mappings: FieldMapping[];
+  readonly mappings: import('@browser-ai/contracts').FieldMapping[];
   readonly mappingSource: 'heuristic' | 'ai';
   readonly missingFields?: Array<{
     selector: string;
@@ -86,7 +89,7 @@ export interface PreviewFillResponse {
 
 export interface ConfirmFillRequest {
   readonly type: typeof MESSAGE_TYPES.CONFIRM_FILL;
-  readonly mappings: FieldMapping[];
+  readonly mappings: import('@browser-ai/contracts').FieldMapping[];
 }
 
 export interface ConfirmFillResponse {
@@ -107,6 +110,51 @@ export interface CancelFillResponse {
   readonly cancelled: true;
 }
 
+export interface ConciergePreviewRequest {
+  readonly type: typeof MESSAGE_TYPES.CONCIERGE_PREVIEW;
+}
+
+export interface ConciergePreviewResponse {
+  readonly ok: boolean;
+  readonly site: string;
+  readonly title: string;
+  readonly url: string;
+  readonly fields: ConciergeFieldItem[];
+  readonly knownCount: number;
+  readonly unknownCount: number;
+  readonly skippedUploadCount: number;
+  readonly submit?: { selector: string; label: string };
+  readonly error?: string;
+}
+
+export interface ConciergeConfirmRequest {
+  readonly type: typeof MESSAGE_TYPES.CONCIERGE_CONFIRM;
+  readonly fields: ConciergeFieldItem[];
+  readonly site: string;
+}
+
+export interface ConciergeConfirmResponse {
+  readonly ok: true;
+  readonly success: boolean;
+  readonly completed: number;
+  readonly total: number;
+  readonly learned: number;
+  readonly submit?: { selector: string; label: string };
+  readonly error?: string;
+}
+
+export interface ConciergeSubmitRequest {
+  readonly type: typeof MESSAGE_TYPES.CONCIERGE_SUBMIT;
+  readonly selector?: string;
+}
+
+export interface ConciergeSubmitResponse {
+  readonly ok: true;
+  readonly success: boolean;
+  readonly label?: string;
+  readonly error?: string;
+}
+
 export type ExtensionRequest =
   | PingRequest
   | ScanPageRequest
@@ -114,7 +162,10 @@ export type ExtensionRequest =
   | RunPlanRequest
   | PreviewFillRequest
   | ConfirmFillRequest
-  | CancelFillRequest;
+  | CancelFillRequest
+  | ConciergePreviewRequest
+  | ConciergeConfirmRequest
+  | ConciergeSubmitRequest;
 
 export type ExtensionResponse =
   | PingResponse
@@ -123,4 +174,7 @@ export type ExtensionResponse =
   | RunPlanResponse
   | PreviewFillResponse
   | ConfirmFillResponse
-  | CancelFillResponse;
+  | CancelFillResponse
+  | ConciergePreviewResponse
+  | ConciergeConfirmResponse
+  | ConciergeSubmitResponse;

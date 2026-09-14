@@ -29,6 +29,9 @@ export default defineConfig({
   plugins: [react(), crx({ manifest })],
   build: {
     rollupOptions: {
+      input: {
+        micPermission: path.resolve(rootDir, 'src/mic-permission/index.html'),
+      },
       preserveEntrySignatures: 'exports-only',
     },
   },

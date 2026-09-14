@@ -8,7 +8,7 @@ interface BrowserSpeechRecognition extends EventTarget {
   start(): void;
   stop(): void;
   onresult: ((event: BrowserSpeechRecognitionEvent) => void) | null;
-  onerror: ((event: Event) => void) | null;
+  onerror: ((event: Event & { error?: string }) => void) | null;
 }
 
 interface BrowserSpeechRecognitionEvent extends Event {
@@ -35,11 +35,16 @@ export function isSpeechRecognitionSupported(): boolean {
 }
 
 /**
- * Web Speech API recognition wrapper.
+ * Web Speech API recognition wrapper (optional fallback; often flaky in extensions).
  */
 export class WebSpeechRecognition implements SpeechRecognitionContract {
   private recognition: BrowserSpeechRecognition | null = null;
   private readonly handlers = new Set<(command: VoiceCommand) => void>();
+  private errorHandler: ((message: string) => void) | null = null;
+
+  onError(handler: (message: string) => void): void {
+    this.errorHandler = handler;
+  }
 
   async start(config: VoiceInputConfig = { sampleRate: 16000 }): Promise<void> {
     const Ctor = getSpeechRecognitionCtor();
@@ -73,8 +78,8 @@ export class WebSpeechRecognition implements SpeechRecognitionContract {
       }
     };
 
-    recognition.onerror = () => {
-      // Consumers observe missing finals / UI state; keep API small for MVP.
+    recognition.onerror = (event) => {
+      this.errorHandler?.(event.error ?? 'speech-recognition-error');
     };
 
     this.recognition = recognition;
@@ -101,3 +106,6 @@ export class WebSpeechRecognition implements SpeechRecognitionContract {
     };
   }
 }
+
+export { LocalMicRecognition } from './localMic';
+export type { LocalMicRecognitionOptions } from './localMic';
