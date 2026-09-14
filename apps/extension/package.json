@@ -1,7 +1,9 @@
 {
   "name": "@browser-ai/extension",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "description": "Browser AI Chrome MV3 extension — form concierge with pluggable AI, STT, and TTS.",
   "type": "module",
   "scripts": {
     "dev": "vite",

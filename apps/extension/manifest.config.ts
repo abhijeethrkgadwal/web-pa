@@ -3,8 +3,8 @@ import { defineManifest } from '@crxjs/vite-plugin';
 export default defineManifest({
   manifest_version: 3,
   name: 'Browser AI',
-  description: 'AI-powered browser assistant for intelligent form filling.',
-  version: '0.0.1',
+  description: 'Local-first form concierge with pluggable AI, STT, and TTS. MIT open source.',
+  version: '0.1.0',
   action: {
     default_popup: 'src/popup/index.html',
     default_title: 'Browser AI',
@@ -28,5 +28,13 @@ export default defineManifest({
     },
   ],
   permissions: ['activeTab', 'scripting', 'storage', 'sidePanel'],
-  host_permissions: ['http://*/*', 'https://*/*', 'file:///*'],
+  host_permissions: [
+    'http://*/*',
+    'https://*/*',
+    'file:///*',
+    'http://127.0.0.1:11434/*',
+    'http://localhost:11434/*',
+    'http://127.0.0.1:8090/*',
+    'http://localhost:8090/*',
+  ],
 });

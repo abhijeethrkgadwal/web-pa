@@ -16,3 +16,5 @@ export * from './streaming';
 export * from './transcription';
 export * from './wakeword';
 export * from './intent';
+export * from './audio/wav';
+export * from './tts';

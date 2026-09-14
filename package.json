@@ -1,6 +1,31 @@
 {
   "name": "browser-ai",
-  "private": true,
+  "version": "0.1.0",
+  "private": false,
+  "description": "Local-first Chrome extension that scans web forms, remembers answers, and fills them with optional pluggable LLM, STT, and TTS providers.",
+  "license": "MIT",
+  "author": "Browser AI Contributors",
+  "keywords": [
+    "chrome-extension",
+    "form-filling",
+    "local-first",
+    "ollama",
+    "whisper",
+    "openai",
+    "anthropic",
+    "tts",
+    "stt",
+    "browser-automation",
+    "accessibility"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhijeethrkgadwal/web-pa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/abhijeethrkgadwal/web-pa/issues"
+  },
+  "homepage": "https://github.com/abhijeethrkgadwal/web-pa#readme",
   "packageManager": "pnpm@9.0.0",
   "workspaces": [
     "apps/*",
@@ -15,7 +40,8 @@
     "test:e2e:install": "playwright install chromium",
     "dev:extension": "pnpm --filter @browser-ai/extension dev",
     "build:extension": "pnpm --filter @browser-ai/extension build",
-    "serve:fixtures": "node scripts/serve-fixtures.mjs"
+    "serve:fixtures": "node scripts/serve-fixtures.mjs",
+    "serve:stt": "pnpm --filter @browser-ai/stt start"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
@@ -26,4 +52,3 @@
     "vitest": "^2.1.8"
   }
 }
-

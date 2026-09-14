@@ -7,7 +7,9 @@ import {
   getUserProfile,
   saveAiSettings,
   saveUserProfile,
+  type AiProviderId,
   type AiSettings,
+  type TtsProviderId,
   type UserProfile,
 } from '@browser-ai/memory';
 
@@ -25,6 +27,13 @@ const EMPTY_FORM: UserProfile = {
   country: '',
   summary: '',
   willingToRelocate: false,
+  address: {
+    line1: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
+  },
 };
 
 export function OptionsApp() {
@@ -32,8 +41,22 @@ export function OptionsApp() {
   const [aiSettings, setAiSettings] = useState<AiSettings>({
     enabled: false,
     provider: 'heuristic',
-    ollamaBaseUrl: 'http://localhost:11434',
+    ollamaBaseUrl: 'http://127.0.0.1:11434',
     ollamaModel: 'llama3.2',
+    openaiBaseUrl: 'https://api.openai.com',
+    openaiModel: 'gpt-4o-mini',
+    openaiApiKey: '',
+    anthropicBaseUrl: 'https://api.anthropic.com',
+    anthropicModel: 'claude-3-5-haiku-latest',
+    anthropicApiKey: '',
+    sttBaseUrl: 'http://127.0.0.1:8090',
+    sttModel: 'Xenova/whisper-tiny.en',
+    sttApiKey: '',
+    ttsProvider: 'none',
+    ttsBaseUrl: 'https://api.openai.com',
+    ttsModel: 'gpt-4o-mini-tts',
+    ttsVoice: 'alloy',
+    ttsApiKey: '',
   });
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [loading, setLoading] = useState(true);
@@ -49,6 +72,13 @@ export function OptionsApp() {
           country: profile.country ?? '',
           summary: profile.summary ?? '',
           willingToRelocate: Boolean(profile.willingToRelocate),
+          address: {
+            line1: profile.address?.line1 ?? '',
+            city: profile.address?.city ?? '',
+            state: profile.address?.state ?? '',
+            postalCode: profile.address?.postalCode ?? '',
+            country: profile.address?.country ?? '',
+          },
         });
         setAiSettings(settings);
       })
@@ -65,11 +95,34 @@ export function OptionsApp() {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function updateAddress(key: keyof NonNullable<UserProfile['address']>, value: string) {
+    setForm((current) => ({
+      ...current,
+      address: {
+        ...current.address,
+        [key]: value,
+      },
+    }));
+  }
+
+  function patchAi<K extends keyof AiSettings>(key: K, value: AiSettings[K]) {
+    setAiSettings((current) => ({ ...current, [key]: value }));
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setStatus({ kind: 'idle' });
 
     try {
+      const addressLine1 = form.address?.line1?.trim() || undefined;
+      const addressCity = form.address?.city?.trim() || undefined;
+      const addressState = form.address?.state?.trim() || undefined;
+      const addressPostal = form.address?.postalCode?.trim() || undefined;
+      const addressCountry = form.address?.country?.trim() || undefined;
+      const hasAddress = Boolean(
+        addressLine1 || addressCity || addressState || addressPostal || addressCountry,
+      );
+
       await saveUserProfile({
         firstName: form.firstName?.trim() || undefined,
         lastName: form.lastName?.trim() || undefined,
@@ -78,12 +131,23 @@ export function OptionsApp() {
         country: form.country?.trim() || undefined,
         summary: form.summary?.trim() || undefined,
         willingToRelocate: Boolean(form.willingToRelocate),
+        address: hasAddress
+          ? {
+              line1: addressLine1,
+              city: addressCity,
+              state: addressState,
+              postalCode: addressPostal,
+              country: addressCountry,
+            }
+          : undefined,
       });
       await saveAiSettings({
-        enabled: aiSettings.enabled,
-        provider: aiSettings.enabled ? 'ollama' : 'heuristic',
-        ollamaBaseUrl: aiSettings.ollamaBaseUrl,
-        ollamaModel: aiSettings.ollamaModel,
+        ...aiSettings,
+        enabled: aiSettings.enabled && aiSettings.provider !== 'heuristic',
+        openaiApiKey: aiSettings.openaiApiKey?.trim() || '',
+        anthropicApiKey: aiSettings.anthropicApiKey?.trim() || '',
+        sttApiKey: aiSettings.sttApiKey?.trim() || '',
+        ttsApiKey: aiSettings.ttsApiKey?.trim() || '',
       });
       setStatus({ kind: 'saved' });
     } catch (error) {
@@ -115,11 +179,20 @@ export function OptionsApp() {
     );
   }
 
+  const provider = aiSettings.provider;
+  const showCloudAi = aiSettings.enabled && (provider === 'openai' || provider === 'anthropic');
+  const showOllama = aiSettings.enabled && provider === 'ollama';
+  const showTtsCloud = aiSettings.ttsProvider === 'openai';
+
   return (
     <main className="options">
       <header className="options__header">
         <h1>Browser AI Profile</h1>
-        <p>Saved locally. Used by smart fill (scan → map → fill).</p>
+        <p>
+          Saved locally on this device. Used by smart fill and the form concierge.
+          Optional third-party AI / TTS keys never leave your browser except to the
+          provider URL you configure.
+        </p>
       </header>
 
       <form className="options__form" onSubmit={handleSubmit}>
@@ -173,6 +246,52 @@ export function OptionsApp() {
           </select>
         </label>
 
+        <section className="options__ai">
+          <h2>Address</h2>
+          <p>Used when forms ask for street, city, state, or postal code.</p>
+          <label>
+            Street address
+            <input
+              value={form.address?.line1 ?? ''}
+              onChange={(event) => updateAddress('line1', event.target.value)}
+              autoComplete="address-line1"
+            />
+          </label>
+          <label>
+            City
+            <input
+              value={form.address?.city ?? ''}
+              onChange={(event) => updateAddress('city', event.target.value)}
+              autoComplete="address-level2"
+            />
+          </label>
+          <label>
+            State / region
+            <input
+              value={form.address?.state ?? ''}
+              onChange={(event) => updateAddress('state', event.target.value)}
+              autoComplete="address-level1"
+            />
+          </label>
+          <label>
+            Postal / ZIP code
+            <input
+              value={form.address?.postalCode ?? ''}
+              onChange={(event) => updateAddress('postalCode', event.target.value)}
+              autoComplete="postal-code"
+            />
+          </label>
+          <label>
+            Address country
+            <input
+              value={form.address?.country ?? ''}
+              onChange={(event) => updateAddress('country', event.target.value)}
+              autoComplete="country-name"
+              placeholder="Optional (falls back to country code above)"
+            />
+          </label>
+        </section>
+
         <label>
           Summary
           <textarea
@@ -192,10 +311,45 @@ export function OptionsApp() {
         </label>
 
         <section className="options__ai">
-          <h2>AI mapping</h2>
+          <h2>Speech-to-text</h2>
           <p>
-            Off by default (heuristics). Enable to try Ollama first; if it fails,
-            heuristics still run.
+            Default: local Whisper (<code>pnpm serve:stt</code>). Point the base URL at
+            any OpenAI-compatible transcription API (OpenAI Whisper, Groq, etc.) and
+            optionally set an API key.
+          </p>
+          <label>
+            STT base URL
+            <input
+              value={aiSettings.sttBaseUrl ?? ''}
+              onChange={(event) => patchAi('sttBaseUrl', event.target.value)}
+              placeholder="http://127.0.0.1:8090"
+            />
+          </label>
+          <label>
+            STT model
+            <input
+              value={aiSettings.sttModel ?? ''}
+              onChange={(event) => patchAi('sttModel', event.target.value)}
+              placeholder="Xenova/whisper-tiny.en"
+            />
+          </label>
+          <label>
+            STT API key (optional)
+            <input
+              type="password"
+              autoComplete="off"
+              value={aiSettings.sttApiKey ?? ''}
+              onChange={(event) => patchAi('sttApiKey', event.target.value)}
+              placeholder="Only for cloud STT"
+            />
+          </label>
+        </section>
+
+        <section className="options__ai">
+          <h2>Language model</h2>
+          <p>
+            Heuristics always work offline. Enable a provider for smarter intent parsing
+            and field mapping. Keys are stored in Chrome local storage only.
           </p>
           <label className="options__checkbox">
             <input
@@ -205,36 +359,163 @@ export function OptionsApp() {
                 setAiSettings((current) => ({
                   ...current,
                   enabled: event.target.checked,
-                  provider: event.target.checked ? 'ollama' : 'heuristic',
+                  provider: event.target.checked
+                    ? current.provider === 'heuristic'
+                      ? 'ollama'
+                      : current.provider
+                    : 'heuristic',
                 }))
               }
             />
-            Use Ollama for field mapping
+            Use an AI provider for intent + field mapping
           </label>
+
           {aiSettings.enabled && (
             <>
               <label>
-                Ollama base URL
-                <input
-                  value={aiSettings.ollamaBaseUrl ?? ''}
+                Provider
+                <select
+                  value={provider}
                   onChange={(event) =>
-                    setAiSettings((current) => ({
-                      ...current,
-                      ollamaBaseUrl: event.target.value,
-                    }))
+                    patchAi('provider', event.target.value as AiProviderId)
                   }
+                >
+                  <option value="ollama">Ollama (local)</option>
+                  <option value="openai">OpenAI-compatible (OpenAI, Groq, LM Studio…)</option>
+                  <option value="anthropic">Anthropic (Claude)</option>
+                </select>
+              </label>
+
+              {showOllama && (
+                <>
+                  <label>
+                    Ollama base URL
+                    <input
+                      value={aiSettings.ollamaBaseUrl ?? ''}
+                      onChange={(event) => patchAi('ollamaBaseUrl', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Ollama model
+                    <input
+                      value={aiSettings.ollamaModel ?? ''}
+                      onChange={(event) => patchAi('ollamaModel', event.target.value)}
+                    />
+                  </label>
+                </>
+              )}
+
+              {showCloudAi && provider === 'openai' && (
+                <>
+                  <label>
+                    Chat base URL
+                    <input
+                      value={aiSettings.openaiBaseUrl ?? ''}
+                      onChange={(event) => patchAi('openaiBaseUrl', event.target.value)}
+                      placeholder="https://api.openai.com"
+                    />
+                  </label>
+                  <label>
+                    Chat model
+                    <input
+                      value={aiSettings.openaiModel ?? ''}
+                      onChange={(event) => patchAi('openaiModel', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    API key
+                    <input
+                      type="password"
+                      autoComplete="off"
+                      value={aiSettings.openaiApiKey ?? ''}
+                      onChange={(event) => patchAi('openaiApiKey', event.target.value)}
+                    />
+                  </label>
+                </>
+              )}
+
+              {showCloudAi && provider === 'anthropic' && (
+                <>
+                  <label>
+                    Anthropic base URL
+                    <input
+                      value={aiSettings.anthropicBaseUrl ?? ''}
+                      onChange={(event) =>
+                        patchAi('anthropicBaseUrl', event.target.value)
+                      }
+                    />
+                  </label>
+                  <label>
+                    Claude model
+                    <input
+                      value={aiSettings.anthropicModel ?? ''}
+                      onChange={(event) => patchAi('anthropicModel', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    API key
+                    <input
+                      type="password"
+                      autoComplete="off"
+                      value={aiSettings.anthropicApiKey ?? ''}
+                      onChange={(event) => patchAi('anthropicApiKey', event.target.value)}
+                    />
+                  </label>
+                </>
+              )}
+            </>
+          )}
+        </section>
+
+        <section className="options__ai">
+          <h2>Text-to-speech (optional)</h2>
+          <p>
+            Speak a short confirmation after fill. Use the browser voice pack (offline)
+            or any OpenAI-compatible <code>/v1/audio/speech</code> endpoint.
+          </p>
+          <label>
+            TTS provider
+            <select
+              value={aiSettings.ttsProvider ?? 'none'}
+              onChange={(event) =>
+                patchAi('ttsProvider', event.target.value as TtsProviderId)
+              }
+            >
+              <option value="none">Off</option>
+              <option value="browser">Browser speechSynthesis</option>
+              <option value="openai">OpenAI-compatible TTS</option>
+            </select>
+          </label>
+          {showTtsCloud && (
+            <>
+              <label>
+                TTS base URL
+                <input
+                  value={aiSettings.ttsBaseUrl ?? ''}
+                  onChange={(event) => patchAi('ttsBaseUrl', event.target.value)}
                 />
               </label>
               <label>
-                Model
+                TTS model
                 <input
-                  value={aiSettings.ollamaModel ?? ''}
-                  onChange={(event) =>
-                    setAiSettings((current) => ({
-                      ...current,
-                      ollamaModel: event.target.value,
-                    }))
-                  }
+                  value={aiSettings.ttsModel ?? ''}
+                  onChange={(event) => patchAi('ttsModel', event.target.value)}
+                />
+              </label>
+              <label>
+                Voice
+                <input
+                  value={aiSettings.ttsVoice ?? ''}
+                  onChange={(event) => patchAi('ttsVoice', event.target.value)}
+                />
+              </label>
+              <label>
+                TTS API key (falls back to OpenAI chat key)
+                <input
+                  type="password"
+                  autoComplete="off"
+                  value={aiSettings.ttsApiKey ?? ''}
+                  onChange={(event) => patchAi('ttsApiKey', event.target.value)}
                 />
               </label>
             </>

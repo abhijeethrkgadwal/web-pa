@@ -60,26 +60,52 @@ export async function getAiSettings(
   }
 
   const settings = value as Partial<AiSettings>;
-  return {
-    enabled: Boolean(settings.enabled),
-    provider: settings.provider === 'ollama' ? 'ollama' : 'heuristic',
-    ollamaBaseUrl: settings.ollamaBaseUrl ?? DEFAULT_AI_SETTINGS.ollamaBaseUrl,
-    ollamaModel: settings.ollamaModel ?? DEFAULT_AI_SETTINGS.ollamaModel,
-  };
+  return normalizeAiSettings(settings);
 }
 
 export async function saveAiSettings(
   settings: AiSettings,
   store: MemoryStore = createDefaultMemoryStore(),
 ): Promise<AiSettings> {
-  const next: AiSettings = {
-    enabled: Boolean(settings.enabled),
-    provider: settings.provider === 'ollama' ? 'ollama' : 'heuristic',
-    ollamaBaseUrl: settings.ollamaBaseUrl ?? DEFAULT_AI_SETTINGS.ollamaBaseUrl,
-    ollamaModel: settings.ollamaModel ?? DEFAULT_AI_SETTINGS.ollamaModel,
-  };
+  const next = normalizeAiSettings(settings);
   await store.set(AI_SETTINGS_KEY, next);
   return next;
+}
+
+const AI_PROVIDERS = new Set(['heuristic', 'ollama', 'openai', 'anthropic']);
+const TTS_PROVIDERS = new Set(['none', 'browser', 'openai']);
+
+function normalizeAiSettings(settings: Partial<AiSettings>): AiSettings {
+  const provider = AI_PROVIDERS.has(settings.provider as string)
+    ? (settings.provider as AiSettings['provider'])
+    : 'heuristic';
+
+  const ttsProvider = TTS_PROVIDERS.has(settings.ttsProvider as string)
+    ? (settings.ttsProvider as AiSettings['ttsProvider'])
+    : DEFAULT_AI_SETTINGS.ttsProvider;
+
+  return {
+    enabled: Boolean(settings.enabled),
+    provider: settings.enabled ? provider : 'heuristic',
+    ollamaBaseUrl: settings.ollamaBaseUrl ?? DEFAULT_AI_SETTINGS.ollamaBaseUrl,
+    ollamaModel: settings.ollamaModel ?? DEFAULT_AI_SETTINGS.ollamaModel,
+    openaiBaseUrl: settings.openaiBaseUrl ?? DEFAULT_AI_SETTINGS.openaiBaseUrl,
+    openaiModel: settings.openaiModel ?? DEFAULT_AI_SETTINGS.openaiModel,
+    openaiApiKey: settings.openaiApiKey ?? DEFAULT_AI_SETTINGS.openaiApiKey,
+    anthropicBaseUrl:
+      settings.anthropicBaseUrl ?? DEFAULT_AI_SETTINGS.anthropicBaseUrl,
+    anthropicModel: settings.anthropicModel ?? DEFAULT_AI_SETTINGS.anthropicModel,
+    anthropicApiKey:
+      settings.anthropicApiKey ?? DEFAULT_AI_SETTINGS.anthropicApiKey,
+    sttBaseUrl: settings.sttBaseUrl ?? DEFAULT_AI_SETTINGS.sttBaseUrl,
+    sttModel: settings.sttModel ?? DEFAULT_AI_SETTINGS.sttModel,
+    sttApiKey: settings.sttApiKey ?? DEFAULT_AI_SETTINGS.sttApiKey,
+    ttsProvider,
+    ttsBaseUrl: settings.ttsBaseUrl ?? DEFAULT_AI_SETTINGS.ttsBaseUrl,
+    ttsModel: settings.ttsModel ?? DEFAULT_AI_SETTINGS.ttsModel,
+    ttsVoice: settings.ttsVoice ?? DEFAULT_AI_SETTINGS.ttsVoice,
+    ttsApiKey: settings.ttsApiKey ?? DEFAULT_AI_SETTINGS.ttsApiKey,
+  };
 }
 
 export { hasProfileValues };

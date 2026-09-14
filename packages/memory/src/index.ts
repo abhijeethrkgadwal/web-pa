@@ -8,4 +8,6 @@ export * from './storage';
 export * from './interfaces';
 export * from './schema/UserProfile';
 export * from './schema/AiSettings';
+export * from './schema/AnswerMemory';
 export * from './profile';
+export * from './answers';

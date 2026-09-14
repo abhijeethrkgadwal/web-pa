@@ -82,9 +82,7 @@ async function buildMappings(store: MemoryStore): Promise<SmartFillPreview> {
   const mappingResult = await formAgent.suggestMappings({
     profile,
     fields: pageModel.fields,
-    useAi: aiSettings.enabled && aiSettings.provider === 'ollama',
-    ollamaBaseUrl: aiSettings.ollamaBaseUrl,
-    ollamaModel: aiSettings.ollamaModel,
+    aiSettings,
   });
 
   const missingFields = findMissingRequiredFields(

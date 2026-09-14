@@ -10,55 +10,57 @@ type ProfileRule = {
 
 const PROFILE_RULES: ProfileRule[] = [
   {
-    match: /full\s*name|your\s*name/i,
+    match: /\b(full\s*name|your\s*name)\b/i,
     read: (profile) =>
       [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.firstName,
   },
   {
-    match: /first\s*name|firstname|given\s*name/i,
+    match: /\b(first\s*name|firstname|given\s*name)\b/i,
     read: (profile) => profile.firstName,
   },
   {
-    match: /last\s*name|lastname|surname|family\s*name/i,
+    match: /\b(last\s*name|lastname|surname|family\s*name)\b/i,
     read: (profile) => profile.lastName,
   },
   {
-    match: /e-?mail/i,
+    match: /\be-?mail\b/i,
     read: (profile) => profile.email,
   },
   {
-    match: /phone|mobile|tel|cell/i,
+    match: /\b(phone|mobile|tel|cell)\b/i,
     read: (profile) => profile.phone,
   },
   {
-    match: /country/i,
+    match: /\bcountry\b/i,
     read: (profile) => profile.country ?? profile.address?.country,
   },
   {
-    match: /summary|about|bio|cover|description|message/i,
+    // Intentionally avoid bare "about" / "cover" / "description" — those match
+    // consent and opinion questions ("feel about commuting", "contact me about…").
+    match: /\b(summary|bio|cover\s*letter|about\s*me|message|notes?)\b/i,
     read: (profile) => profile.summary,
   },
   {
-    match: /relocate|relocation/i,
+    match: /\b(relocate|relocation)\b/i,
     read: (profile) =>
       typeof profile.willingToRelocate === 'boolean'
         ? String(profile.willingToRelocate)
         : undefined,
   },
   {
-    match: /city/i,
+    match: /\bcity\b/i,
     read: (profile) => profile.address?.city,
   },
   {
-    match: /state|province|region/i,
+    match: /\b(state|province|region)\b/i,
     read: (profile) => profile.address?.state,
   },
   {
-    match: /zip|postal|post\s*code/i,
+    match: /\b(zip|postal|post\s*code)\b/i,
     read: (profile) => profile.address?.postalCode,
   },
   {
-    match: /address|street/i,
+    match: /\b(street\s*address|address\s*line|home\s*address)\b/i,
     read: (profile) => profile.address?.line1,
   },
 ];
@@ -113,12 +115,26 @@ export function mapProfileToFieldsHeuristic(
 function resolveValue(profile: UserProfile, field: PageField): string | undefined {
   const haystack = `${field.name} ${field.label ?? ''} ${field.placeholder ?? ''}`;
 
+  if (isBooleanField(field)) {
+    if (/\b(relocate|relocation)\b/i.test(haystack)) {
+      return typeof profile.willingToRelocate === 'boolean'
+        ? String(profile.willingToRelocate)
+        : undefined;
+    }
+    // Never dump text profile values into consent / marketing checkboxes.
+    return undefined;
+  }
+
   if (field.type === FieldType.EMAIL || field.type === 'email') {
     return profile.email;
   }
 
   if (field.type === FieldType.TEL || field.type === 'tel') {
     return profile.phone;
+  }
+
+  if (looksLikeOpinionOrConsentQuestion(haystack)) {
+    return undefined;
   }
 
   for (const rule of PROFILE_RULES) {
@@ -131,6 +147,21 @@ function resolveValue(profile: UserProfile, field: PageField): string | undefine
   }
 
   return undefined;
+}
+
+function isBooleanField(field: PageField): boolean {
+  return (
+    field.type === FieldType.CHECKBOX ||
+    field.type === FieldType.RADIO ||
+    field.type === 'checkbox' ||
+    field.type === 'radio'
+  );
+}
+
+function looksLikeOpinionOrConsentQuestion(haystack: string): boolean {
+  return /\b(feel about|contact me|opportunit|commuting|agree to|i agree|consent|privacy policy|terms of|marketing|newsletter)\b/i.test(
+    haystack,
+  );
 }
 
 function adaptValueForField(field: PageField, value: string): string {

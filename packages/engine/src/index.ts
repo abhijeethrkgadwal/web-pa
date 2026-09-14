@@ -43,3 +43,4 @@ export * from './ExecutionPlan';
 export * from './plans/jobApplicationFromProfile';
 export * from './plans/jobApplicationDemo';
 export * from './smartFill';
+export * from './concierge';

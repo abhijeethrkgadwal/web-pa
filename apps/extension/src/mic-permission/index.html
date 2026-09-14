@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser AI — Microphone</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #f4f7fb;
+        color: #10233f;
+      }
+      main {
+        width: min(420px, calc(100vw - 2rem));
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgb(16 35 63 / 8%);
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.25rem;
+      }
+      p {
+        margin: 0 0 1rem;
+        line-height: 1.45;
+        color: #40566f;
+      }
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 0.7rem 1rem;
+        background: #1f6feb;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .status {
+        margin-top: 1rem;
+        padding: 0.75rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+      }
+      .ok {
+        background: #e8f7ee;
+        color: #146c2e;
+      }
+      .err {
+        background: #fdecec;
+        color: #9b1c1c;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Allow microphone</h1>
+      <p>
+        Chrome cannot reliably ask for mic access inside the side panel. Grant it
+        here once, then go back and press <strong>Mic</strong> again.
+      </p>
+      <button id="grant" type="button">Allow microphone</button>
+      <div id="status" hidden></div>
+    </main>
+    <script type="module">
+      const button = document.getElementById('grant');
+      const status = document.getElementById('status');
+
+      function show(kind, message) {
+        status.hidden = false;
+        status.className = `status ${kind}`;
+        status.textContent = message;
+      }
+
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach((track) => track.stop());
+          show('ok', 'Microphone allowed. Return to the Browser AI side panel and press Mic.');
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : 'Could not access the microphone';
+          show(
+            'err',
+            `${message}. Check the site permission icon in the address bar (mic) and set it to Allow.`,
+          );
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
